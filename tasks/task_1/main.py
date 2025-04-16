@@ -4,12 +4,11 @@ load_dotenv()
 import os
 import pathlib
 import requests
-import json
-import csv
 from google.cloud import storage
 from google.cloud import bigquery
 import functions_framework
-
+import json
+import csv
 
 
 # Set up the directory for storing raw data
@@ -17,12 +16,10 @@ DATA_DIR = pathlib.Path(__file__).parent / 'raw_data'
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 @functions_framework.http
-def extract_phl_opa_assessments(request):
-    DATA_DIR = pathlib.Path(__file__).parent / 'raw_data'
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    # Download the OPA assessments data as a CSV
-    url = "https://opendata-downloads.s3.amazonaws.com/assessments.csv"
-    filename = DATA_DIR / 'opa_assessments.csv'
+def extract_phl_opa_properties(request):
+    # Download the OPA Properties data as a CSV
+    url = 'https://opendata-downloads.s3.amazonaws.com/opa_properties_public.csv'
+    filename = DATA_DIR / 'opa_properties.csv'
 
     response = requests.get(url)
     response.raise_for_status()
@@ -35,7 +32,7 @@ def extract_phl_opa_assessments(request):
 
     # Upload the downloaded file to cloud storage
     BUCKET_NAME = os.getenv('DATA_LAKE_BUCKET_RAW')
-    blobname = 'opa_assessments/opa_assessments.csv'
+    blobname = 'opa_properties/opa_properties.csv'
 
     storage_client = storage.Client()
     bucket = storage_client.bucket(BUCKET_NAME)
@@ -48,65 +45,76 @@ def extract_phl_opa_assessments(request):
     return f'Downloaded and uploaded gs://{BUCKET_NAME}/{blobname}'
 
 @functions_framework.http
-def prepare_opa_assessments(request):
+def prepare_opa_properties(request):
+    # Define data directory
+    DATA_DIR = pathlib.Path(__file__).parent
+    raw_dir = DATA_DIR / 'raw_data'
+    prepared_dir = DATA_DIR / 'prepared_data'
 
-    
-    DATA_DIR = pathlib.Path(__file__).parent 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    # Ensure subdirectories exist
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    prepared_dir.mkdir(parents=True, exist_ok=True)
 
-    # Retrieve bucket names
+    # Retrieve bucket names from environment
     bucket_name_raw = os.getenv('DATA_LAKE_BUCKET_RAW')
     bucket_name_prepare = os.getenv('DATA_LAKE_BUCKET_PREPARED')
 
-    # Ensure bucket names are set
     if not bucket_name_raw or not bucket_name_prepare:
-        raise ValueError("Bucket name is not set. Check your .env file and environment variables.")
+        raise ValueError("Bucket name is not set. Check your environment variables.")
 
-    # Initialize Google Cloud Storage client
+    # Initialize GCS client and buckets
     storage_client = storage.Client()
     bucket_raw = storage_client.bucket(bucket_name_raw)
-
-    # Define file paths
-    raw_filename = DATA_DIR / 'raw_data/opa_assessments.csv'
-    prepared_filename = DATA_DIR / 'raw_data/opa_assessments.jsonl'
-
-    # Download the raw data from the bucket
-    raw_blobname = 'opa_assessments/opa_assessments.csv'
-    blob = bucket_raw.blob(raw_blobname)
-    blob.download_to_filename(raw_filename)
-    print(f'Downloaded to {raw_filename}')
-
-    # Load the data from the CSV file
-    with open(raw_filename, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        data = list(reader)
-
-    # Write the data to a JSONL file
-    with open(prepared_filename, 'w', encoding='utf-8') as f:
-        for row in data:
-            f.write(json.dumps(row) + '\n')
-
-    print(f'Processed data into {prepared_filename}')
-
-    # Upload the prepared data to the bucket
     bucket_prepare = storage_client.bucket(bucket_name_prepare)
-    prepared_blobname = 'opa_assessments/data.jsonl'
+
+    # File paths
+    raw_filename = raw_dir / 'opa_properties.csv'
+    prepared_filename = prepared_dir / 'opa_properties.jsonl'
+
+    # Download raw CSV from cloud storage
+    raw_blobname = 'opa_properties/opa_properties.csv'
+    blob = bucket_raw.blob(raw_blobname)
+
+    try:
+        blob.download_to_filename(raw_filename)
+        print(f'Downloaded to {raw_filename}')
+    except Exception as e:
+        return f"Failed to download raw data: {e}", 500
+
+    # Convert CSV to JSONL
+    try:
+        with open(raw_filename, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            data = list(reader)
+
+        with open(prepared_filename, 'w', encoding='utf-8') as f:
+            for row in data:
+                f.write(json.dumps(row) + '\n')
+
+        print(f'Processed data into {prepared_filename}')
+    except Exception as e:
+        return f"Failed to process file: {e}", 500
+
+    # Upload prepared JSONL to bucket
+    prepared_blobname = 'opa_properties/data.jsonl'
     blob = bucket_prepare.blob(prepared_blobname)
-    blob.upload_from_filename(prepared_filename, timeout=300)
 
-    print(f'Uploaded to {prepared_blobname}')
+    try:
+        blob.upload_from_filename(prepared_filename, timeout=300)
+        print(f'Uploaded to {prepared_blobname}')
+    except Exception as e:
+        return f"Failed to upload prepared file: {e}", 500
 
-    return f"Successfully prepared and uploaded the file to {prepared_blobname}"
-
+    return f"Successfully prepared and uploaded the file to {prepared_blobname}", 200
 
 @functions_framework.http
-def load_opa_assessments(request):
+def load_opa_properties(request):
     """Function to create/update external and internal tables in BigQuery."""
     SOURCE_DATASET = "source"
     CORE_DATASET = "core"
-    TABLE_NAME = "opa_assessments"
+    TABLE_NAME = "opa_properties"
     BUCKET_NAME = os.getenv('DATA_LAKE_BUCKET_PREPARED')
-    BLOB_NAME = "opa_assessments/data.jsonl"
+    BLOB_NAME = "opa_properties/opa_properties.jsonl"
     try:
         client = bigquery.Client()
 
@@ -116,14 +124,85 @@ def load_opa_assessments(request):
         # SQL to create/update external table
         create_external_table_query = f"""
         CREATE OR REPLACE EXTERNAL TABLE `{SOURCE_DATASET}.{TABLE_NAME}`(
+            objectid STRING,
+            assessment_date STRING,
+            basements STRING,
+            beginning_point STRING,
+            book_and_page STRING,
+            building_code STRING,
+            building_code_description STRING,
+            category_code STRING,
+            category_code_description STRING,
+            census_tract STRING,
+            central_air STRING,
+            cross_reference STRING,
+            date_exterior_condition STRING,
+            depth STRING,
+            exempt_building STRING,
+            exempt_land STRING,
+            exterior_condition STRING,
+            fireplaces STRING,
+            frontage STRING,
+            fuel STRING,
+            garage_spaces STRING,
+            garage_type STRING,
+            general_construction STRING,
+            geographic_ward STRING,
+            homestead_exemption STRING,
+            house_extension STRING,
+            house_number STRING,
+            interior_condition STRING,
+            location STRING,
+            mailing_address_1 STRING,
+            mailing_address_2 STRING,
+            mailing_care_of STRING,
+            mailing_city_state STRING,
+            mailing_street STRING,
+            mailing_zip STRING,
+            market_value STRING,
+            market_value_date STRING,
+            number_of_bathrooms STRING,
+            number_of_bedrooms STRING,
+            number_of_rooms STRING,
+            number_stories STRING,
+            off_street_open STRING,
+            other_building STRING,
+            owner_1 STRING,
+            owner_2 STRING,
             parcel_number STRING,
-            year STRING,
-            market_value FLOAT64,
-            taxable_land FLOAT64,
-            taxable_building FLOAT64,
-            exempt_land FLOAT64,
-            exempt_building FLOAT64,
-            objectid STRING
+            parcel_shape STRING,
+            quality_grade STRING,
+            recording_date STRING,
+            registry_number STRING,
+            sale_date STRING,
+            sale_price STRING,
+            separate_utilities STRING,
+            sewer STRING,
+            site_type STRING,
+            state_code STRING,
+            street_code STRING,
+            street_designation STRING,
+            street_direction STRING,
+            street_name STRING,
+            suffix STRING,
+            taxable_building STRING,
+            taxable_land STRING,
+            topography STRING,
+            total_area STRING,
+            total_livable_area STRING,
+            type_heater STRING,
+            unfinished STRING,
+            unit STRING,
+            utility STRING,
+            view_type STRING,
+            year_built STRING,
+            year_built_estimate STRING,
+            zip_code STRING,
+            zoning STRING,
+            pin STRING,
+            building_code_new STRING,
+            building_code_description_new STRING,
+            geog STRING
         )
         OPTIONS (
           format = 'JSON',
