@@ -66,7 +66,7 @@ gcloud functions call load_pwd_parcels ^
 _run_sql_:
 
 ```shell
-gcloud functions deploy run_sql `
+gcloud functions deploy run_sql ^
 --gen2 ^
 --region=us-east4 ^
 --runtime=python312 ^

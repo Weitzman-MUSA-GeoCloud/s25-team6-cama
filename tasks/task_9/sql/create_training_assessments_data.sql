@@ -14,7 +14,8 @@ SELECT
         IFNULL(NULLIF(main.number_of_bedrooms, ""), "NA") AS number_of_bedrooms,
         IFNULL(NULLIF(main.number_stories, ""), "NA") AS number_stories,
         IFNULL(NULLIF(main.total_area, ""), "NA") AS total_area,
-        IFNULL(NULLIF(main.year_built, ""), "NA") AS year_built
+        IFNULL(NULLIF(main.year_built, ""), "NA") AS year_built,
+        IFNULL(NULLIF(main.property_id, ""), "NA") AS property_id
 
 
 FROM(

@@ -31,7 +31,7 @@ gcloud functions deploy prepare_phl_opa_properties ^
 --source=. ^
 --entry-point=prepare_opa_properties ^
 --service-account=data-pipeline-user@musa5090s25-team6.iam.gserviceaccount.com ^
---memory=4Gi ^
+--memory=8Gi ^
 --timeout=240s ^
 --trigger-http ^
 --no-allow-unauthenticated
