@@ -13,8 +13,4 @@ package-lock.json
 data/
 
 # Sensitive files
-keys/
-
-raw_data/*
-prepared_data/*
 
