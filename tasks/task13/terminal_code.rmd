@@ -1,0 +1,24 @@
+## CORS Configuration for Public Bucket
+
+In order to allow the web application to access the files stored in our public GCS bucket, we configured CORS on the bucket.
+
+### 1. Create the CORS Configuration File
+
+We created a file named `cors-config.json` with the following content:
+
+```json
+[
+  {
+    "origin": ["*"],
+    "responseHeader": ["Content-Type"],
+    "method": ["GET", "HEAD", "OPTIONS"],
+    "maxAgeSeconds": 3600
+  }
+]
+
+```
+
+### 2. Apply the CORS Configuration
+
+run the code in the terminal:
+gcloud storage buckets update gs://musa5090s25-team6-public --cors-file=cors-config.json
