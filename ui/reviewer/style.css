@@ -11,10 +11,6 @@ body {
   color: #333;
   padding: 1rem;
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-  overflow-x: hidden;
->>>>>>> Stashed changes
 =======
   overflow-x: hidden;
 >>>>>>> Stashed changes
@@ -39,14 +35,8 @@ body {
 #dashboard {
   display: grid;
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-=======
-  grid-template-columns: 3fr 2fr; /* Wider charts, smaller map */
-  gap: 1rem;
-  align-items: flex-start;
->>>>>>> Stashed changes
 =======
   grid-template-columns: 3fr 2fr; /* Wider charts, smaller map */
   gap: 1rem;
@@ -81,13 +71,7 @@ body {
   padding: 0.5rem;
   border-radius: 6px;
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
   min-height: 200px;
-=======
-  min-height: 220px;
-  max-height: 350px;
-  overflow: hidden;
->>>>>>> Stashed changes
 =======
   min-height: 220px;
   max-height: 350px;
@@ -103,15 +87,12 @@ body {
 
 #map-section {
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
   background: white;
   padding: 1rem;
   border-radius: 8px;
   height: 100%;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 =======
-=======
->>>>>>> Stashed changes
   position: relative;
   background: white;
   padding: 1rem;
@@ -119,23 +100,15 @@ body {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   height: auto;
   max-height: 600px;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
 }
 
 #map {
   position: relative;
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
   height: 100%;
   min-height: 600px;
   background: #e0e0e0;
-=======
-  height: 500px;
-  width: 100%;
->>>>>>> Stashed changes
 =======
   height: 500px;
   width: 100%;
@@ -153,13 +126,8 @@ body {
   border-radius: 6px;
   font-size: 0.85rem;
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   z-index: 1;
-=======
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
->>>>>>> Stashed changes
 =======
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   z-index: 1000;
@@ -173,13 +141,8 @@ body {
 }
 
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 /* Responsive */
 @media (max-width: 900px) {
-=======
-/* Responsive Layout */
-@media (max-width: 1100px) {
->>>>>>> Stashed changes
 =======
 /* Responsive Layout */
 @media (max-width: 1100px) {
@@ -192,10 +155,7 @@ body {
     grid-template-columns: 1fr;
   }
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 =======
-=======
->>>>>>> Stashed changes
 
   .chart {
     max-height: 320px;
@@ -204,8 +164,5 @@ body {
   #map {
     height: 400px;
   }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
 }
