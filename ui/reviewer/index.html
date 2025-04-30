@@ -6,8 +6,20 @@
   <title>Mass Appraisal Reviewer</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://d3js.org/d3.v7.min.js"></script>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+=======
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+>>>>>>> Stashed changes
+=======
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+>>>>>>> Stashed changes
 </head>
 <body>
 
@@ -45,6 +57,8 @@
     <!-- RIGHT PANEL -->
     <div id="right-panel">
       <section id="map-section">
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <div id="map">
           <div id="map-legend" class="map-overlay">
             <label><input type="radio" name="metric" value="current"> Current $ values</label><br/>
@@ -52,11 +66,27 @@
             <label><input type="radio" name="metric" value="percent" checked> % Change since 2023</label><br/>
             <label><input type="radio" name="metric" value="absolute"> $ Change since 2023</label>
           </div>
+=======
+=======
+>>>>>>> Stashed changes
+        <div id="map"></div>
+        <div id="map-legend" class="map-overlay">
+          <label><input type="radio" name="metric" value="current"> Current $ values</label><br/>
+          <label><input type="radio" name="metric" value="prior"> 2023 $ values</label><br/>
+          <label><input type="radio" name="metric" value="percent" checked> % Change since 2023</label><br/>
+          <!-- Optional: remove if you don’t yet define 'absolute' layer -->
+          <label><input type="radio" name="metric" value="absolute"> $ Change since 2023</label>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         </div>
       </section>
     </div>
   </main>
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Add placeholder charts
@@ -83,5 +113,15 @@
       });
     });
   </script>
+=======
+  <!-- ✅ Loads your modular JS logic -->
+  <script type="module" src="js/main.js"></script>
+
+>>>>>>> Stashed changes
+=======
+  <!-- ✅ Loads your modular JS logic -->
+  <script type="module" src="js/main.js"></script>
+
+>>>>>>> Stashed changes
 </body>
 </html>
