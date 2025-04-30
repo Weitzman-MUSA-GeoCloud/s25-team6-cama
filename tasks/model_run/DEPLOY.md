@@ -15,13 +15,14 @@ gcloud artifacts repositories create run-model --repository-format=docker ^
 ```shell
 gcloud builds submit ^
   --region us-central1 ^
-  --tag us-central1-docker.pkg.dev/musa5090s25-team6/run-model/model-image:2
+  --tag us-central1-docker.pkg.dev/musa5090s25-team6/run-model/model-image:3
 ```
+
 
 ## OLD:Change to update/create depending on if job already exists
 ```shell
   gcloud run jobs update run-model ^
-    --image us-central1-docker.pkg.dev/musa5090s25-team6/run-model/model-image:2^
+    --image us-central1-docker.pkg.dev/musa5090s25-team6/run-model/model-image:3^
     --service-account data-pipeline-user@musa5090s25-team6.iam.gserviceaccount.com ^
     --cpu 4 ^
     --memory 4Gi ^

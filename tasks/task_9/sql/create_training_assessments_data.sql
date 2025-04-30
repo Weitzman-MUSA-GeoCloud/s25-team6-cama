@@ -6,16 +6,21 @@ SELECT
   SUBSTR(main.sale_date, 1, 4) AS sale_year,
      IFNULL(NULLIF(main.basements, ""), "NA") AS basements,
         IFNULL(NULLIF(main.building_code, ""), "NA") AS building_code,
-        IFNULL(NULLIF(main.census_tract, ""), "NA") AS census_tract,
-        IFNULL(NULLIF(main.exterior_condition, ""), "NA") AS exterior_condition,
         IFNULL(NULLIF(main.zip_code, ""), "NA") AS zip_code,
-        IFNULL(NULLIF(main.zoning, ""), "NA") AS zoning,
         IFNULL(NULLIF(main.number_of_bathrooms, ""), "NA") AS number_of_bathrooms,
         IFNULL(NULLIF(main.number_of_bedrooms, ""), "NA") AS number_of_bedrooms,
         IFNULL(NULLIF(main.number_stories, ""), "NA") AS number_stories,
-        IFNULL(NULLIF(main.total_area, ""), "NA") AS total_area,
         IFNULL(NULLIF(main.year_built, ""), "NA") AS year_built,
-        IFNULL(NULLIF(main.property_id, ""), "NA") AS property_id
+        IFNULL(NULLIF(main.property_id, ""), "NA") AS property_id,
+        IFNULL(NULLIF(main.market_value, ""), "NA") AS market_value,
+        IFNULL(NULLIF(main.total_livable_area, ""), "NA") AS total_livable_area,
+        IFNULL(NULLIF(main.garage_spaces, ""), "NA") AS garage_spaces,
+        IFNULL(NULLIF(main.depth, ""), "NA") AS depth,
+        IFNULL(NULLIF(main.category_code_description, ""), "NA") AS category_code_description,
+        IFNULL(NULLIF(main.interior_condition, ""), "NA") AS interior_condition
+
+
+
 
 
 FROM(
