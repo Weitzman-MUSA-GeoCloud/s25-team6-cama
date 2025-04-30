@@ -1,0 +1,8 @@
+echo [
+  {
+    "origin": ["*"],
+    "responseHeader": ["Content-Type"],
+    "method": ["GET", "HEAD", "OPTIONS"],
+    "maxAgeSeconds": 3600
+  }
+] > cors-config.json
