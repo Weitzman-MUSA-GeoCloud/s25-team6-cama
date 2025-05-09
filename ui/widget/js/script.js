@@ -5,38 +5,72 @@ async function lookupAssessment() {
     return;
   }
 
-  const apiUrl = `https://us-east4-musa5090s25-team6.cloudfunctions.net/request_files?type=predictions&property_id='${opaId}'`;
+  const urlPast = `https://us-east4-musa5090s25-team6.cloudfunctions.net/request_files?type=past_assessments&property_id=${opaId}`;
+  const urlPred = `https://us-east4-musa5090s25-team6.cloudfunctions.net/request_files?type=predictions&property_id=${opaId}`;
 
   try {
-    const response = await fetch(apiUrl);
-    if (!response.ok) throw new Error("API request failed");
+    const [resPast, resPred] = await Promise.all([fetch(urlPast), fetch(urlPred)]);
+    if (!resPast.ok || !resPred.ok) throw new Error("One or both API requests failed");
 
-    const data = await response.json();
+    const [dataPast, dataPred] = await Promise.all([resPast.json(), resPred.json()]);
 
-    if (!Array.isArray(data) || data.length === 0) {
-      alert("No assessment data found for this OPA ID.");
-      return;
+    // ========================
+    // 🟦 CHART DATA
+    // ========================
+    const chartYears = [];
+    const chartValues = [];
+
+    // Add past assessment market values
+    if (Array.isArray(dataPast)) {
+      const sortedPast = dataPast.sort((a, b) => a.tax_year - b.tax_year);
+      sortedPast.forEach(row => {
+        chartYears.push(Number(row.tax_year));
+        chartValues.push(row.market_value);
+      });
     }
 
-    // Sort by tax year (ascending)
-    const sorted = data.sort((a, b) => a.tax_year - b.tax_year);
+    // Add predicted 2026 value (first valid one found)
+    let predictionRow = null;
+    if (Array.isArray(dataPred)) {
+      predictionRow = dataPred.find(d => d.predicted_at === "2026" && Number(d.predicted_value) > 0);
+      if (predictionRow) {
+        chartYears.push(2026);
+        chartValues.push(Number(predictionRow.predicted_value));
+      }
+    }
 
-    // Chart: market value over time
-    const years = sorted.map(row => row.tax_year);
-    const values = sorted.map(row => row.market_value);
+    renderChart(chartYears, chartValues);
 
-    // Table: detailed breakdown
-    const breakdown = sorted.map(row => ({
-      year: row.tax_year,
-      market: row.market_value,
-      land: row.taxable_land ?? 0,
-      improvement: row.taxable_building ?? 0,
-      exemptLand: row.exempt_land ?? 0,
-      exemptImprovement: row.exempt_building ?? 0
-    }));
+    // ========================
+    // 🟨 TABLE DATA
+    // ========================
+    const tableRows = [];
 
-    renderChart(years, values);
-    renderTable(breakdown);
+    if (Array.isArray(dataPast)) {
+      dataPast.forEach(row => {
+        tableRows.push({
+          year: Number(row.tax_year),
+          market: row.market_value,
+          land: row.taxable_land,
+          improvement: row.taxable_building,
+          exemptLand: row.exempt_land,
+          exemptImprovement: row.exempt_building
+        });
+      });
+    }
+
+    if (predictionRow) {
+      tableRows.push({
+        year: 2026,
+        market: Number(predictionRow.predicted_value),
+        land: 0,
+        improvement: 0,
+        exemptLand: 0,
+        exemptImprovement: 0
+      });
+    }
+
+    renderTable(tableRows);
 
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -63,6 +97,7 @@ function renderChart(labels, data) {
         datasets: [{
           label: 'Assessed Market Value',
           data,
+          pointBackgroundColor: labels.map(year => year === 2026 ? 'red' : '#0072ce'),
           borderColor: '#0072ce',
           backgroundColor: 'rgba(0, 114, 206, 0.1)',
           fill: true,
@@ -91,13 +126,15 @@ function renderTable(data) {
     <tbody>`;
 
   data.forEach(row => {
-    html += `<tr>
-      <td>${row.year ?? 'N/A'}</td>
-      <td>$${(row.market ?? 0).toLocaleString()}</td>
-      <td>$${(row.land ?? 0).toLocaleString()}</td>
-      <td>$${(row.improvement ?? 0).toLocaleString()}</td>
-      <td>$${(row.exemptLand ?? 0).toLocaleString()}</td>
-      <td>$${(row.exemptImprovement ?? 0).toLocaleString()}</td>
+    const isPrediction = row.year === 2026;
+    html += `<tr style="color: ${isPrediction ? 'red' : '#222'};">`;
+    html += `
+      <td>${row.year}</td>
+      <td>$${row.market.toLocaleString()}</td>
+      <td>$${row.land.toLocaleString()}</td>
+      <td>$${row.improvement.toLocaleString()}</td>
+      <td>$${row.exemptLand.toLocaleString()}</td>
+      <td>$${row.exemptImprovement.toLocaleString()}</td>
     </tr>`;
   });
 
