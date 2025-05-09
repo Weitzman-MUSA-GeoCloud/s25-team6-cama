@@ -28,3 +28,25 @@ gcloud builds submit ^
     --memory 4Gi ^
     --region us-central1 
 ```
+
+
+pipeline workflow:
+```shell
+gcloud workflows deploy predictive_pipeline ^
+--source=model_pipeline.yaml ^
+--location=us-east4 ^
+--service-account=data-pipeline-user@musa5090s25-team6.iam.gserviceaccount.com
+
+gcloud scheduler jobs create http predictive_pipeline ^
+  --schedule="0 0 * * 1" ^
+  --time-zone="America/New_York" ^
+  --uri="https://workflowexecutions.googleapis.com/v1/projects/musa5090s25-team6/locations/us-east4/workflows/phl-assessments-data-pipeline/executions" ^
+  --http-method=POST ^
+  --oauth-service-account-email="data-pipeline-user@musa5090s25-team6.iam.gserviceaccount.com" ^
+  --location=us-east4
+
+```
+
+```shell
+gcloud workflows run phl-assessments-data-pipeline ^
+  --location=us-east4

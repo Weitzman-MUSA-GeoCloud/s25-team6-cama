@@ -74,7 +74,10 @@ def get_sql(sql_filename, arguments):
     return result
 
 
-# Generic function to fill in parameters into sql script
 def render_template(sql_query_template, context):
     clean_template = sql_query_template.replace('${', '{')
-    return clean_template.format(**context)
+    safe_context = {
+        key: f"'{value}'" if value is not None else "NULL"
+        for key, value in context.items()
+    }
+    return clean_template.format(**safe_context)

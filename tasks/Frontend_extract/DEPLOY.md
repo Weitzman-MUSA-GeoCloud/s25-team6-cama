@@ -12,13 +12,8 @@ gcloud functions deploy request_files ^
 --service-account=data-pipeline-user@musa5090s25-team6.iam.gserviceaccount.com ^
 --memory=8Gi ^
 --timeout=3600s ^
---trigger-http 
+--trigger-http ^
 --allow-unauthenticated
 
 ```
 
-
-```shell
-gcloud functions call prepare_model_training_data ^
---region=us-east4 
-```
